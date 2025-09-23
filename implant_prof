@@ -1,0 +1,81 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from numpy.linalg import lstsq
+
+# Constants from problem statement (Å)
+Rp0    = 1025.0 / 200.0   # 5.125 Å/keV
+sigma0 = 215.0  / 200.0   # 1.075 Å/keV
+
+def Rp(E_keV):
+    return Rp0 * E_keV
+
+def sigma(E_keV):
+    return sigma0 * E_keV
+
+# Gaussian implant profile
+# C(z) = Dose / (sqrt(2π) σ) * exp( -(z - Rp)^2 / (2σ^2) )
+def gaussian_basis(z_cm, Rp_A, sigma_A):
+    Rp_cm = Rp_A * 1e-8
+    sigma_cm = sigma_A * 1e-8
+    return (1.0 / (np.sqrt(2*np.pi) * sigma_cm)) * \
+           np.exp(-0.5 * ((z_cm - Rp_cm)/sigma_cm)**2)
+
+
+# Tunable implant energies
+energies = [30, 60, 120, 200]  # keV 
+
+# A list of Rp and sigma
+implants = [(E, Rp(E), sigma(E)) for E in energies]
+
+# Plot setup
+z_A = np.linspace(0, 2000, 2001)   # depth grid in Å
+z_cm = z_A * 1e-8
+target = np.zeros_like(z_cm)
+target[(z_A >= 250) & (z_A <= 1000)] = 1e17
+
+# Matrix setup
+G = []
+for E, Rp_A, sigma_A in implants:
+    G.append(gaussian_basis(z_cm, Rp_A, sigma_A))
+G = np.array(G).T  # shape = (len(z), num_implants)
+
+# Solve least-squares for doses
+D, residuals, rank, s = lstsq(G, target, rcond=None)
+
+# Clip negatives
+D = np.clip(D, 0, None)
+
+# Total profile
+C_total = G @ D
+
+print("Energies and solved doses:")
+for (E, Rp_A, sigma_A), dose in zip(implants, D):
+    Rp_val = Rp_A
+    sigma_val = sigma_A
+    peak_conc = dose / (np.sqrt(2*np.pi) * (sigma_val*1e-8))
+    print(f"{E:6.1f} keV | Rp={Rp_val:7.1f} Å | σ={sigma_val:6.1f} Å | "
+          f"Dose={dose:.3e} cm^-2 | Peak Conc={peak_conc:.3e} cm^-3")
+
+plt.figure(figsize=(8,6))
+plt.semilogy(z_A, C_total, label="Total profile")
+
+for (E, Rp_A, sigma_A), dose in zip(implants, D):
+    C_i = dose * gaussian_basis(z_cm, Rp_A, sigma_A)
+    if dose > 0:
+        plt.semilogy(z_A, C_i, "--", label=f"{E} keV")
+
+plt.axhline(1e17, color="r", linestyle="--", label="Target = 1e17 cm⁻³")
+plt.axhline(1e15, color="k", linestyle=":")
+plt.axvline(100, color="g", linestyle=":")
+plt.axvline(250, color="g", linestyle=":")
+plt.axvline(1000, color="g", linestyle=":")
+plt.axvline(1700, color="g", linestyle=":")
+
+plt.xlabel("Depth (Å)")
+plt.ylabel("Concentration (cm⁻³)")
+plt.title("Arsenic Ion Implant Profile (Solved by Least-Squares)")
+plt.legend()
+plt.grid(True, which="both", ls=":")
+plt.ylim(1e12, plt.ylim()[1])  # Set y-axis lower limit to 1e12
+plt.tight_layout()
+plt.show()
