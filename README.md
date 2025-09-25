@@ -42,7 +42,8 @@ with $E_i$ = implant energy in keV.
 
 ### Target Profile Constraints
 
-These were given in the problem statement. 
+These were given in the problem statement. Essentially, with four implants, we're trying to obtain a profile that is as flat as possible in the flat concentration region.
+
 
 - Flat concentration:
 
