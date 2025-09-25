@@ -83,7 +83,16 @@ where $C(z)$ is the sum of Gaussians (above) and $C_\text{target}(z)$ is the des
 The second script examines the effect of annealing on our generated doping profile. We do this by first assuming the surface to be at infinity relative to the peak and approximating the new straggle to be: 
 
 
-ΔRp → sqrt((ΔRp)^2 + 2*D*t)
+<img width="188" height="47" alt="image" src="https://github.com/user-attachments/assets/c9a83976-8e4e-4648-a72b-b6ece23d447e" />
+
+
+We can then see how the profile changes in response to (a) a 1000 degree C, 45 minute anneal, (b) after a RTP at 1100 degrees C for 10 seconds, which looks like: 
+
+<img width="1000" height="600" alt="image" src="https://github.com/user-attachments/assets/a6f3ae7e-dc0f-40ca-82e0-59582e102760" />
+
+So, given this plot, can we say the surface at infinity assumption is valid for both of these annealing cases? For part (a), no. The diffusion length is very large, which can be seen from just how broad the Gaussian is after the anneal. So, saying that surfaces don't affect the diffusion profile is just not valid. For part (b), however, RTP only causes a very moderate broadening of the profile, and you could say that, for the RTP case, the assumption is more valid. 
+
+
 
 
 
