@@ -82,8 +82,8 @@ where $C(z)$ is the sum of Gaussians (above) and $C_\text{target}(z)$ is the des
 
 The second script examines the effect of annealing on our generated doping profile. We do this by first assuming the surface to be at infinity relative to the peak and approximating the new straggle to be: 
 
-$$
+
 ΔRp → sqrt((ΔRp)^2 + 2*D*t)
-$$
+
 
 
