@@ -67,14 +67,14 @@ $$
 
 ### Least-Squares Formulation
 
-Choose implant energies $E_i$, compute corresponding $R_{p,i}$ and $\sigma_i$, then solve for the doses $D_i$ that minimize:
+We can set up a matrix to define the four Gaussians. Choose implant energies $E_i$, compute corresponding $R_{p,i}$ and $\sigma_i$, then solve for the doses $D_i$ that minimize:
 
 $$
 \min_{D_1,\dots,D_N} 
 \sum_{z \in \text{grid}} \Big( C(z) - C_\text{target}(z) \Big)^2
 $$
 
-where $C(z)$ is the sum of Gaussians (above) and $C_\text{target}(z)$ is the desired profile.
+where $C(z)$ is the sum of Gaussians (above) and $C_\text{target}(z)$ is the desired profile. We get to "arbitrarily" choose the four energies of the implants. This lets us shape the profile.
 
 
 
