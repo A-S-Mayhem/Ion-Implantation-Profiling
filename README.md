@@ -17,9 +17,10 @@ Where:
 - $z$ = depth (cm)  
 - $D_i$ = dose of implant $i$ (atoms/cm²)  
 - $R_{p,i}$ = projected range for implant $i$ (cm)  
-- $\sigma_i$ = straggle for implant $i$ (cm)  
+- $\sigma_i$ = straggle for implant $i$ (cm)
+- $N$ = 4, to model a profile after four successive implants  
 
-In this case, I'm using N = 4 to model a profile after four successive implants. 
+
 ---
 
 ### Projected Range and Straggle
