@@ -19,6 +19,7 @@ Where:
 - $R_{p,i}$ = projected range for implant $i$ (cm)  
 - $\sigma_i$ = straggle for implant $i$ (cm)  
 
+In this case, I'm using N = 4 to model a profile after four successive implants. 
 ---
 
 ### Projected Range and Straggle
