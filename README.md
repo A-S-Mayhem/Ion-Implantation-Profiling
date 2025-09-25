@@ -42,6 +42,8 @@ with $E_i$ = implant energy in keV.
 
 ### Target Profile Constraints
 
+These were given in the problem statement. 
+
 - Flat concentration:
 
 $$
