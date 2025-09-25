@@ -21,7 +21,6 @@ Where:
 - $N$ = 4, to model a profile after four successive implants  
 
 
----
 
 ### Projected Range and Straggle
 
@@ -38,7 +37,6 @@ $$
 with $E_i$ = implant energy in keV.  
 (Units: Å; convert to cm by multiplying by $10^{-8}$.)
 
----
 
 ### Target Profile Constraints
 
@@ -63,7 +61,7 @@ $$
 C(z) < 1 \times 10^{15} \ \text{cm}^{-3}, \quad z > 1700 \,\text{Å}
 $$
 
----
+
 
 ### Least-Squares Formulation
 
