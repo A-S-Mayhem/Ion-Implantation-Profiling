@@ -1,0 +1,82 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Implant parameters from  least-squares solution
+energies = np.array([30.0, 60.0, 120.0, 200.0])  # keV
+Rp_A = 5.125 * energies     # projected range in Å
+sigma_A = 1.075 * energies  # straggle in Å
+doses = np.array([0.0, 1.818876e11, 3.312324e11, 5.321128e11])  # atoms/cm^2
+
+# Depth grid (Å and cm)
+z_A = np.linspace(0, 3000, 3001)   # depth in Å
+z_cm = z_A * 1e-8                  # depth in cm
+
+#Gaussian implant profile
+def gaussian_profile(z_cm, dose_cm2, Rp_A, sigma_A):
+    Rp_cm = Rp_A * 1e-8
+    sigma_cm = sigma_A * 1e-8
+    return (dose_cm2 / (np.sqrt(2*np.pi)*sigma_cm)) * \
+           np.exp(-0.5 * ((z_cm - Rp_cm)/sigma_cm)**2)
+
+# Original summed profile
+C_orig = np.zeros_like(z_cm)
+for D, Rp, s in zip(doses, Rp_A, sigma_A):
+    C_orig += gaussian_profile(z_cm, D, Rp, s)
+
+# Diffusion parameters 
+D0 = 0.066  # cm^2/s
+Ea = 3.44   # eV
+k_B = 8.617333262145e-5  # eV/K
+
+# Anneal cases
+cases = {
+    "Furnace 1000C 45min": {"T_C": 1000.0, "t_s": 45*60},
+    "RTP 1100C 10s": {"T_C": 1100.0, "t_s": 10.0}
+}
+
+# Apply diffusion broadening
+results = {}
+for name, vals in cases.items():
+    T_K = vals["T_C"] + 273.15
+    t = vals["t_s"]
+    D = D0 * np.exp(-Ea / (k_B * T_K))  # diffusivity
+    new_sigmas_cm = np.sqrt((sigma_A*1e-8)**2 + 2*D*t)
+
+    # recompute profile with broadened sigmas
+    C_new = np.zeros_like(z_cm)
+    for dose, Rp, s_cm in zip(doses, Rp_A, new_sigmas_cm):
+        sigma_A_new = s_cm / 1e-8
+        C_new += gaussian_profile(z_cm, dose, Rp, sigma_A_new)
+
+    results[name] = {
+        "T_K": T_K,
+        "t_s": t,
+        "D_cm2s": D,
+        "C_new": C_new,
+        "new_sigmas_cm": new_sigmas_cm
+    }
+
+# Plotting
+plt.figure(figsize=(10,6))
+plt.semilogy(z_A, C_orig, label="Original (as-implanted)")
+for name, res in results.items():
+    plt.semilogy(z_A, res["C_new"], label=name)
+
+plt.xlim(0, 2000)
+plt.ylim(1e12, 1e18)
+plt.xlabel("Depth (Å)")
+plt.ylabel("Concentration (atoms/cm³)")
+plt.title("Arsenic profiles: as-implanted and after anneals")
+plt.legend()
+plt.grid(True, which='both', ls=':')
+plt.show()
+
+# Check shallow region for validity of "surface at infinity" assumption
+for name, res in results.items():
+    Cnew = res["C_new"]
+    max_shallow = Cnew[z_A < 100].max()
+    at_surface = Cnew[0]
+    print(f"{name}:")
+    print(f"  Diffusivity D = {res['D_cm2s']:.3e} cm^2/s")
+    print(f"  Max conc for z<100 Å: {max_shallow:.3e} cm^-3")
+    print(f"  Surface conc at z=0: {at_surface:.3e} cm^-3\n")
